@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include "../shared.h"
+#include "../util.h"
 
 bool channelList[24];
 
