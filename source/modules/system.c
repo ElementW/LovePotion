@@ -200,6 +200,28 @@ static int systemGetProcessorCount(lua_State *L){
 	
 }
 
+static int systemOpenURL(lua_State *L){
+	
+	/*aptOpenSession();
+	
+	if (APT_PrepareToStartSystemApplet(APPID_WEB) ||
+		APT_StartSystemApplet(APPID_WEB, 0, 0, NULL)) {
+		
+		lua_pushboolean(L, false);
+		aptCloseSession();
+		return 1;
+		
+	}
+	
+	lua_pushboolean(L, false);
+	
+	aptCloseSession();*/
+	
+	lua_pushboolean(L, false);
+	return 1;
+	
+}
+
 int initLoveSystem(lua_State *L) {
 
 	luaL_Reg reg[] = {
@@ -209,6 +231,7 @@ int initLoveSystem(lua_State *L) {
 		{ "getModel",			systemGetModel         },
 		{ "getLanguage",		systemGetLanguage      },
 		{ "getRegion",			systemGetRegion        },
+		{ "openURL",			systemOpenURL          },
 		{ 0, 0 },
 	};
 
