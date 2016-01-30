@@ -173,8 +173,16 @@ static int systemGetPowerInfo(lua_State *L){
 		
 	} else if (batteryStateBool == 1) {
 		
-		lua_pushstring(L, "charging");
-	
+		if (batteryPercent == 5) {
+			
+			lua_pushstring(L, "charged");
+			
+		} else {
+			
+			lua_pushstring(L, "charging");
+			
+		}
+		
 	}
 	
 	lua_pushnumber(L, batteryPercent * 20); //PTMU_GetBatteryLevel returns a number between 0 and 5, so I multiply it for 20 to match LÖVE, which gives 0-100
