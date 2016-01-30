@@ -24,23 +24,23 @@
 
 #define CONFIG_3D_SLIDERSTATE (*(float*)0x1FF81080)
 
-int fileExists (char *filename){
+int fileExists(const char *filename) {
 	struct stat st;
 	int result = stat(filename, &st);
 	return result == 0;
 }
 
-void luaError(lua_State *L, char *message) {
+void luaError(lua_State *L, const char *message) {
 	luaL_error(L, message);
 }
 
-const char *fileExtension(const char *filename) {
+const char* fileExtension(const char *filename) {
 	const char *dot = strrchr(filename, '.');
 	if(!dot || dot == filename) return "";
 	return dot + 1;
 }
 
-char* concat(char *s1, char *s2) {
+char* concat(const char *s1, const char *s2) {
 	
 	char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the zero-terminator
 
@@ -66,7 +66,7 @@ int getType(const char *name) {
 
 }
 
-int getfield (int key) {
+int getfield(int key) {
 	int result;
 	lua_pushstring(L, key);
 	lua_gettable(L, -2);

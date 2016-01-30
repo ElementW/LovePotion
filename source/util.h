@@ -23,13 +23,13 @@
 #ifndef UTIL_H_INCLUDED
 #define UTIL_H_INCLUDED
 
-int fileExists(char *filename);
+int fileExists(const char *filename);
 
-void luaError(lua_State *L, char *message);
+void luaError(lua_State *L, const char *message);
 
 const char *fileExtension(const char *filename);
 
-char* concat(char *s1, char *s2) ;
+char* concat(const char *s1, const char *s2) ;
 
 int getType(const char *name);
 
