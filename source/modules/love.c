@@ -45,6 +45,8 @@ int initFontClass(lua_State *L);
 int initSourceClass(lua_State *L);
 int initQuadClass(lua_State *L);
 
+void finiLoveSystem();
+
 int initLove(lua_State *L) {
 
 	// Thanks to rxi for this https://github.com/rxi/lovedos/blob/master/src/love.c
@@ -89,5 +91,11 @@ int initLove(lua_State *L) {
 	}
 
 	return 1;
+
+}
+
+void finiLove() {
+
+	finiLoveSystem();
 
 }

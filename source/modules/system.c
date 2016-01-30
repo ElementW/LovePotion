@@ -22,6 +22,8 @@
 
 #include "../shared.h"
 
+static char *clipboard = NULL;
+
 static int systemGetOS(lua_State *L) { // love.system.getOS()
 
 	lua_pushstring(L, "3ds");
@@ -202,7 +204,8 @@ static int systemGetProcessorCount(lua_State *L){
 
 static int systemOpenURL(lua_State *L){
 	
-	/*aptOpenSession();
+	/* TODO find a way to pass parameters to the web browser
+	aptOpenSession();
 	
 	if (APT_PrepareToStartSystemApplet(APPID_WEB) ||
 		APT_StartSystemApplet(APPID_WEB, 0, 0, NULL)) {
@@ -222,21 +225,65 @@ static int systemOpenURL(lua_State *L){
 	
 }
 
+static int systemSetClipboardText(lua_State *L) {
+
+	const char *str = luaL_checkstring(L, 1);
+
+	if (!str) {
+		
+		return 0;
+		
+	}
+
+	free(clipboard);
+	int len = strlen(str);
+	clipboard = malloc(len + 1);
+	strncpy(clipboard, str, len + 1);
+
+	return 0;
+
+}
+
+static int systemGetClipboardText(lua_State *L) {
+
+	lua_pushstring(L, clipboard);
+
+	return 1;
+
+}
+
+static int systemVibrate(lua_State *L) {
+
+	return 0;
+
+}
+
 int initLoveSystem(lua_State *L) {
 
 	luaL_Reg reg[] = {
-		{ "getOS",				systemGetOS            },
-		{ "getPowerInfo",		systemGetPowerInfo     },
-		{ "getProcessorCount",	systemGetProcessorCount},
-		{ "getModel",			systemGetModel         },
-		{ "getLanguage",		systemGetLanguage      },
-		{ "getRegion",			systemGetRegion        },
-		{ "openURL",			systemOpenURL          },
+		{ "getClipboardText",	systemGetClipboardText	},
+		{ "getOS",				systemGetOS				},
+		{ "getPowerInfo",		systemGetPowerInfo		},
+		{ "getProcessorCount",	systemGetProcessorCount	},
+		{ "openURL",			systemOpenURL			},
+		{ "setClipboardText",	systemSetClipboardText	},
+		{ "vibrate",			systemVibrate			},
+		
+		/** LövePotion exensions **/
+		{ "getModel",			systemGetModel			},
+		{ "getLanguage",		systemGetLanguage		},
+		{ "getRegion",			systemGetRegion			},
 		{ 0, 0 },
 	};
 
 	luaL_newlib(L, reg);
 
 	return 1;
+
+}
+
+void finiLoveSystem() {
+
+	free(clipboard);
 
 }

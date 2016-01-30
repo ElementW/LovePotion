@@ -27,6 +27,7 @@ char *rootDir = "";
 lua_State *L;
 
 int initLove(lua_State *L);
+void finiLove();
 
 bool errorOccured = false;
 bool forceQuit = false;
@@ -203,6 +204,7 @@ int main() {
 	}
 
 	luaL_dostring(L, "love.audio.stop()");
+	finiLove();
 
 	lua_close(L);
 
