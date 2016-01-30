@@ -192,14 +192,23 @@ static int systemGetPowerInfo(lua_State *L){
 	
 }
 
+static int systemGetProcessorCount(lua_State *L){
+	
+	lua_pushnumber(L, 1);
+	
+	return 1;
+	
+}
+
 int initLoveSystem(lua_State *L) {
 
 	luaL_Reg reg[] = {
-		{ "getOS",		   systemGetOS		 },
-		{ "getPowerInfo",  systemGetPowerInfo},
-		{ "getModel",	   systemGetModel    },
-		{ "getLanguage",   systemGetLanguage },
-		{ "getRegion",     systemGetRegion   },
+		{ "getOS",				systemGetOS            },
+		{ "getPowerInfo",		systemGetPowerInfo     },
+		{ "getProcessorCount",	systemGetProcessorCount},
+		{ "getModel",			systemGetModel         },
+		{ "getLanguage",		systemGetLanguage      },
+		{ "getRegion",			systemGetRegion        },
 		{ 0, 0 },
 	};
 
