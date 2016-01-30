@@ -58,28 +58,27 @@ const char *sourceInit(love_source *self, const char *filename) {
 
 			if (file) {
 
-				bool valid = true;
+				const char *error = NULL;
 
 				char buff[8];
 
 				// Master chunk
 				fread(buff, 4, 1, file); // ckId
-				if (strncmp(buff, "RIFF", 4) != 0) valid = false;
+				if (strncmp(buff, "RIFF", 4) != 0) error = "RIFF header not found";
 
 				fseek(file, 4, SEEK_CUR); // skip ckSize
 
 				fread(buff, 4, 1, file); // WAVEID
-				if (strncmp(buff, "WAVE", 4) != 0) valid = false;
-
+				if (strncmp(buff, "WAVE", 4) != 0) error = "WAVE header not found";
 				// fmt Chunk
 				fread(buff, 4, 1, file); // ckId
-				if (strncmp(buff, "fmt ", 4) != 0) valid = false;
+				if (strncmp(buff, "fmt ", 4) != 0) error = "fmt chunk not found";
 
 				fread(buff, 4, 1, file); // ckSize
-				if (*buff != 16) valid = false; // should be 16 for PCM format
+				if (*buff != 16) error = "WAV not in PCM format"; // should be 16 for PCM format
 
 				fread(buff, 2, 1, file); // wFormatTag
-				if (*buff != 0x0001) valid = false; // PCM format
+				if (*buff != 0x0001) error = "WAV not in PCM format"; // PCM format
 
 				u16 channels;
 				fread(&channels, 2, 1, file); // nChannels
@@ -108,8 +107,8 @@ const char *sourceInit(love_source *self, const char *filename) {
 
 					int i = fread(&buff, 4, 1, file); // next chunk ckId
 
-					if (i < 4) { // reached EOF before finding a data chunk
-						valid = false;
+					if (i < 4) {
+						error = "reached EOF before finding a data chunk";
 						break;
 					}
 				}
@@ -125,9 +124,9 @@ const char *sourceInit(love_source *self, const char *filename) {
 				else if (byte_per_sample == 2) self->encoding = NDSP_ENCODING_PCM16;
 				else return "unknown encoding, needs to be PCM8 or PCM16";
 
-				if (!valid) {
+				if (error != NULL) {
 					fclose(file);
-					return "invalid PCM wav file";
+					return error;
 				}
 
 				self->audiochannel = getOpenChannel();
