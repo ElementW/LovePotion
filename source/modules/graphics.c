@@ -22,17 +22,58 @@
 
 #include "../shared.h"
 
-int currentR = 0xFF;
-int currentG = 0xFF;
-int currentB = 0xFF;
-int currentA = 0xFF;
+struct Color {
+
+	u8 r, g, b, a;
+
+};
+
+typedef enum BlendMode {
+
+	BlendMode_alpha,
+	BlendMode_replace,
+	BlendMode_screen,
+	BlendMode_add,
+	BlendMode_subtract,
+	BlendMode_multiply
+
+} BlendMode;
+
+typedef enum BlendAlphaMode {
+
+	BlendAlphaMode_alphamultiply,
+	BlendAlphaMode_premultiplied
+
+} BlendAlphaMode;
+
+struct Coord {
+
+	double x, y;
+
+};
+
+struct Transform {
+
+	struct Coord translation, shear;
+	double rotation;
+
+};
+
+struct GraphicsState {
+
+	struct Color bg, fg;
+
+	BlendMode blendMode;
+	BlendAlphaMode blendAlphaMode;
+
+	struct Transform transform;
+
+} currentState;
 
 int currentScreen = GFX_BOTTOM;
 
 love_font *currentFont;
 
-int transX = 0;
-int transY = 0;
 bool isPushed = false;
 
 bool is3D = false;
@@ -45,7 +86,7 @@ char *defaultMagFilter = "linear";
 
 u32 getCurrentColor() {
 
-	return RGBA8(currentR, currentG, currentB, currentA);
+	return RGBA8(currentState.fg.r, currentState.fg.g, currentState.fg.b, currentState.fg.a);
  
 }
 
@@ -55,8 +96,8 @@ int translateCoords(int *x, int *y) {
 
 	if (isPushed) {
 
-		*x += transX;
-		*y += transY;
+		*x += currentState.transform.translation.x;
+		*y += currentState.transform.translation.y;
 
 	}
 
@@ -91,10 +132,10 @@ static int graphicsSetColor(lua_State *L) { // love.graphics.setColor()
 
 	if (lua_isnumber(L, -1)) {
 
-		currentR = luaL_checkinteger(L, 1);
-		currentG = luaL_checkinteger(L, 2);
-		currentB = luaL_checkinteger(L, 3);
-		currentA = luaL_optnumber(L, 4, currentA);
+		currentState.fg.r = luaL_checkinteger(L, 1);
+		currentState.fg.g = luaL_checkinteger(L, 2);
+		currentState.fg.b = luaL_checkinteger(L, 3);
+		currentState.fg.a = luaL_optnumber(L, 4, currentState.fg.a);
 
 	} else if (lua_istable(L, -1)) {
 
@@ -108,10 +149,10 @@ static int graphicsSetColor(lua_State *L) { // love.graphics.setColor()
 
 static int graphicsGetColor(lua_State *L) { // love.graphics.getColor()
 
-	lua_pushnumber(L, currentR);
-	lua_pushnumber(L, currentG);
-	lua_pushnumber(L, currentB);
-	lua_pushnumber(L, currentA);
+	lua_pushnumber(L, currentState.fg.r);
+	lua_pushnumber(L, currentState.fg.g);
+	lua_pushnumber(L, currentState.fg.b);
+	lua_pushnumber(L, currentState.fg.a);
 
 	return 4;
 
@@ -441,8 +482,8 @@ static int graphicsPop(lua_State *L) { // love.graphics.pop()
 
 	if (sf2d_get_current_screen() == currentScreen) {
 
-		transX = 0;
-		transY = 0;
+		currentState.transform.translation.x = 0;
+		currentState.transform.translation.y = 0;
 		isPushed = false;
 
 	}
@@ -455,8 +496,8 @@ static int graphicsOrigin(lua_State *L) { // love.graphics.origin()
 
 	if (sf2d_get_current_screen() == currentScreen) {
 
-		transX = 0;
-		transY = 0;
+		currentState.transform.translation.x = 0;
+		currentState.transform.translation.y = 0;
 
 	}
 
@@ -471,8 +512,8 @@ static int graphicsTranslate(lua_State *L) { // love.graphics.translate()
 		int dx = luaL_checkinteger(L, 1);
 		int dy = luaL_checkinteger(L, 2);
 
-		transX = transX + dx;
-		transY = transY + dy;
+		currentState.transform.translation.x = currentState.transform.translation.x + dx;
+		currentState.transform.translation.y = currentState.transform.translation.y + dy;
 
 	}
 
@@ -573,25 +614,53 @@ const char *fontDefaultInit(love_font *self, int size);
 int initLoveGraphics(lua_State *L) {
 
 	luaL_Reg reg[] = {
+		/** Drawing **/
+		//{ "arc",				graphicsArc					},
+		{ "circle",				graphicsCircle				},
+		//{ "clear",				graphicsClear				},
+		//{ "discard",			graphicsDiscard				},
+		{ "draw",				graphicsDraw				},
+		//{ "ellipse",			graphicsEllipse				},
+		{ "line",				graphicsLine				},
+		//{ "points",				graphicsPoints				},
+		//{ "polygon",			graphicsPolygon				},
+		{ "present",			graphicsPresent				},
+		{ "print",				graphicsPrint				},
+		{ "printf",				graphicsPrintFormat			},
+		{ "rectangle",			graphicsRectangle			},
+		//{ "stencil",			graphicsStencil				},
+		
+		/** Object Creation **/
+		//{ "newCanvas",			canvasNew					},
+		{ "newFont",			fontNew						},
+		{ "newImage",			imageNew					},
+		//{ "newImageFont",		imageFontNew				},
+		//{ "newMesh",			meshNew						},
+		//{ "newParticleSystem",	particleSystemNew			},
+		{ "newQuad",			quadNew						},
+		//{ "newScreenshot",		screenshotNew				},
+		//{ "newShader",			shaderNew					},
+		//{ "newSpriteBatch",		spriteBatchNew				},
+		//{ "newText",			textNew						},
+		//{ "newVideo",			videoNew					},
+		//{ "setNewFont",			graphicsSetNewFont			},
+
+		/** Graphics State **/
+		//{ "getBackgroundColor",	graphicsGetBackgroundColor	},
+		//{ "getBlendMode",		graphicsGetBlendMode		},
+		//{ "getCanvas",			graphicsGetCanvas			},
+		//{ "getCanvasFormats",	graphicsGetCanvasFormats	},
+		{ "getColor",			graphicsGetColor			},
+		//{ "getColorMask",		graphicsGetColorMask		},
 		{ "setBackgroundColor",	graphicsSetBackgroundColor	},
 		{ "setColor",			graphicsSetColor			},
-		{ "getColor",			graphicsGetColor			},
-		{ "rectangle",			graphicsRectangle			},
-		{ "circle",				graphicsCircle				},
-		{ "line",				graphicsLine				},
+		
 		{ "getScreen",			graphicsGetScreen			},
 		{ "setScreen",			graphicsSetScreen			},
 		{ "getSide",			graphicsGetSide				},
-		{ "present",			graphicsPresent				},
 		{ "getWidth",			graphicsGetWidth			},
 		{ "getHeight",			graphicsGetHeight			},
-		{ "newImage",			imageNew					},
-		{ "newFont",			fontNew						},
-		{ "newQuad",			quadNew						},
-		{ "draw",				graphicsDraw				},
 		{ "setFont",			graphicsSetFont				},
-		{ "print",				graphicsPrint				},
-		{ "printf",				graphicsPrintFormat			},
 		{ "push",				graphicsPush				},
 		{ "pop",				graphicsPop					},
 		{ "origin",				graphicsOrigin				},
