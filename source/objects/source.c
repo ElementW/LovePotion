@@ -105,7 +105,7 @@ const char *sourceInit(love_source *self, const char *filename) {
 
 					fseek(file, ckSize, SEEK_CUR); // skip chunk
 
-					int i = fread(&buff, 4, 1, file); // next chunk ckId
+					int i = fread(&buff, 1, 4, file); // next chunk ckId
 
 					if (i < 4) {
 						error = "reached EOF before finding a data chunk";
@@ -143,9 +143,9 @@ const char *sourceInit(love_source *self, const char *filename) {
 
 		} else return "Unknown audio type";
 
-	}
+	} else return "Could not open source, file does not exist";
 
-	return "Could not open source, does not exist";
+	return NULL;
 
 }
 
