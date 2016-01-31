@@ -62,6 +62,17 @@ static int systemGetModel(lua_State *L) { // love.system.getModel()
 
 }
 
+static int systemIsNew3DS(lua_State *L) { // love.system.isNew3DS()
+	
+	u8 model;
+	CFGU_GetSystemModel(&model);
+	
+	lua_pushboolean(L, model == 2 || model == 4);
+	
+	return 1;
+
+}
+
 static int systemGetLanguage(lua_State *L) { // love.system.getLanguage()
 	
 	u8 language;
@@ -273,6 +284,7 @@ int initLoveSystem(lua_State *L) {
 		{ "getModel",			systemGetModel			},
 		{ "getLanguage",		systemGetLanguage		},
 		{ "getRegion",			systemGetRegion			},
+		{ "isNew3DS",			systemIsNew3DS			},
 		{ 0, 0 },
 	};
 
