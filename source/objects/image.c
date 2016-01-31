@@ -124,7 +124,7 @@ int imageSetFilter(lua_State *L) { // image:setFilter()
 	if (strcmp(minMode, "linear") != 0 && 
 		strcmp(minMode, "nearest") != 0 &&
 		strcmp(magMode, "linear") != 0 &&
-		strcmp(magMode, "nearest" != 0)) {
+		strcmp(magMode, "nearest") != 0) {
 			luaError(L, "Invalid Image Filter.");
 			return 0;
 		}
