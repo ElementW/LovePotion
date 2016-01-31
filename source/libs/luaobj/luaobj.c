@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "luaobj.h"
+#include "../lua/compat-5.2.h"
 
 int luaobj_newclass(lua_State *L, const char *name, const char *extends, 
                     int (*constructor)(lua_State*), luaL_Reg* reg
