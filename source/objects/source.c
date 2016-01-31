@@ -60,23 +60,23 @@ const char *sourceInit(love_source *self, const char *filename) {
 			if (file) {
 
 				const char *error = NULL;
-
+				u32 ckSize;
 				char buff[8];
 
 				// Master chunk
 				fread(buff, 4, 1, file); // ckId
-				if (strncmp(buff, "RIFF", 4) != 0) error = "RIFF header not found";
+				if (strncmp(buff, "RIFF", 4) != 0) error = "RIFF chunk not found";
 
 				fseek(file, 4, SEEK_CUR); // skip ckSize
 
 				fread(buff, 4, 1, file); // WAVEID
-				if (strncmp(buff, "WAVE", 4) != 0) error = "WAVE header not found";
+				if (strncmp(buff, "WAVE", 4) != 0) error = "RIFF not in WAVE format";
 				// fmt Chunk
 				fread(buff, 4, 1, file); // ckId
 				if (strncmp(buff, "fmt ", 4) != 0) error = "fmt chunk not found";
 
 				fread(buff, 4, 1, file); // ckSize
-				if (*buff != 16) error = "WAV not in PCM format"; // should be 16 for PCM format
+				if (*buff != 16) error = "WAV not in PCM format (bad chunk size)"; // should be 16 for PCM format
 
 				fread(buff, 2, 1, file); // wFormatTag
 				if (*buff != 0x0001) error = "WAV not in PCM format"; // PCM format
@@ -101,10 +101,9 @@ const char *sourceInit(love_source *self, const char *filename) {
 				// There may be some additionals chunks between fmt and data
 				fread(&buff, 4, 1, file); // ckId
 				while (strncmp(buff, "data", 4) != 0) {
-					u32 size;
-					fread(&size, 4, 1, file); // ckSize
+					fread(&ckSize, 4, 1, file); // ckSize
 
-					fseek(file, size, SEEK_CUR); // skip chunk
+					fseek(file, ckSize, SEEK_CUR); // skip chunk
 
 					int i = fread(&buff, 4, 1, file); // next chunk ckId
 
@@ -115,9 +114,8 @@ const char *sourceInit(love_source *self, const char *filename) {
 				}
 
 				// data Chunk (ckId already read)
-				u32 size;
-				fread(&size, 4, 1, file); // ckSize
-				self->size = size;
+				fread(&ckSize, 4, 1, file); // ckSize
+				self->size = ckSize;
 
 				self->nsamples = self->size / byte_per_block;
 
@@ -145,7 +143,9 @@ const char *sourceInit(love_source *self, const char *filename) {
 
 		} else return "Unknown audio type";
 
-	} else return "Could not open source, does not exist";
+	}
+
+	return "Could not open source, does not exist";
 
 }
 
@@ -188,7 +188,7 @@ int sourcePlay(lua_State *L) { // source:play()
 
 	if (self->audiochannel == -1) {
 		luaError(L, "No available audio channel");
-		return;
+		return 0;
 	}
 
 	ndspChnWaveBufClear(self->audiochannel);
