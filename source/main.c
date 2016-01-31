@@ -215,6 +215,6 @@ int main() {
 
 	if (soundEnabled) ndspExit();
 
-	return 0;
+	return quitStatus;
 
 }

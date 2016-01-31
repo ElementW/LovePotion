@@ -104,6 +104,7 @@ extern int drawScreen;
 extern char dsNames[32][32];
 extern char *rootDir;
 extern bool shouldQuit;
+extern int quitStatus;
 extern love_font *currentFont;
 extern bool is3D;
 extern const char *fontDefaultInit();

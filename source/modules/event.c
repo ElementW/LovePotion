@@ -23,10 +23,17 @@
 #include "../shared.h"
 
 bool shouldQuit = false;
+int quitStatus = 0;
 
 static int eventQuit(lua_State *L) { // love.event.quit()
 
 	shouldQuit = true;
+
+	if (lua_isnumber(L, 1)) {
+		
+		quitStatus = lua_tonumber(L, 1);
+		
+	}
 
 	return 0;
 
