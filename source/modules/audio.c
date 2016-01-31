@@ -21,12 +21,13 @@
 // THE SOFTWARE.
 
 #include "../shared.h"
+#include "../util.h"
 
 bool soundEnabled;
 
 static int audioStop(lua_State *L) { // love.audio.stop()
 
-	if (!soundEnabled) luaError(L, "Could not initialize audio");
+	if (!soundEnabled) luaU_error(L, "Could not initialize audio");
 
 	for (int i = 0; i <= 23; i++) {
 		ndspChnWaveBufClear(i);

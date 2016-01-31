@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include "../shared.h"
+#include "../util.h"
 
 #include "Vera_ttf.h"
 
@@ -57,7 +58,7 @@ int fontNew(lua_State *L) { // love.graphics.newFont()
 		fontCounter += 1;
 
 		const char *filename = lua_isnoneornil(L, 1) ? NULL : luaL_checkstring(L, 1);
-		int size = lua_isnoneornil(L, 2) ? NULL : luaL_checkinteger(L, 2);
+		int size = lua_isnoneornil(L, 2) ? 12 : luaL_checkinteger(L, 2);
 
 		love_font *self = luaobj_newudata(L, sizeof(*self));
 
@@ -69,7 +70,7 @@ int fontNew(lua_State *L) { // love.graphics.newFont()
 
 			const char *error = fontInit(self, filename, size);
 
-			if (error) luaError(L, error);
+			if (error) luaU_error(L, error);
 
 		} else {
 
@@ -80,7 +81,7 @@ int fontNew(lua_State *L) { // love.graphics.newFont()
 
 	} else {
 
-		luaError(L, "LovePotion currently has a 2 font limit. This limitation will hopefully be lifted in future versions.");
+		luaU_error(L, "LovePotion currently has a 2 font limit. This limitation will hopefully be lifted in future versions.");
 		return 0;
 
 	}

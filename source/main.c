@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include "shared.h"
+#include "util.h"
 
 char *rootDir = "";
 
@@ -31,7 +32,7 @@ void finiLove();
 
 bool errorOccured = false;
 bool forceQuit = false;
-char *errMsg;
+const char *errMsg;
 
 void displayError() {
 
@@ -58,22 +59,23 @@ int main() {
 
 	osSetSpeedupEnable(true); // Enables CPU speedup (I think?)
 
-	// Change working directory
-	char cwd[256];
-	getcwd(cwd, 256);
-	char newCwd[261];
-	strcat(newCwd, cwd);
-	strcat(newCwd, "game");
-	chdir(newCwd);
+	/* Change working directory */ {
+		char cwd[256];
+		getcwd(cwd, 256);
+		char newCwd[261];
+		strcat(newCwd, cwd);
+		strcat(newCwd, "game");
+		chdir(newCwd);
+	}
 
-	luaL_dostring(L, "_defaultFont_ = love.graphics.newFont(); love.graphics.setFont(_defaultFont_)");
+	luaU_dostring(L, "_defaultFont_ = love.graphics.newFont(); love.graphics.setFont(_defaultFont_)");
 
-	luaL_dostring(L, "print(''); print('\x1b[1;36mLovePotion 1.0.9 BETA\x1b[0m (LOVE for 3DS)'); print('')"); // Ew.
+	luaU_dostring(L, "print(''); print('\x1b[1;36mLovePotion 1.0.9 BETA\x1b[0m (LOVE for 3DS)'); print('')"); // Ew.
 
-	luaL_dostring(L, "package.path = './?.lua;./?/init.lua'"); // Set default requiring path.
-	luaL_dostring(L, "package.cpath = './?.lua;./?/init.lua'");
+	luaU_dostring(L, "package.path = './?.lua;./?/init.lua'"); // Set default requiring path.
+	luaU_dostring(L, "package.cpath = './?.lua;./?/init.lua'");
 
-	luaL_dostring(L, 
+	luaU_dostring(L, 
 		"function love.errhand(msg)\n"
 			"love.audio.stop()"
 			"love.graphics.setBackgroundColor(89, 157, 220)\n"
@@ -88,7 +90,7 @@ int main() {
 
 	if (luaL_dofile(L, "main.lua")) displayError();
 
-	if (luaL_dostring(L, "if love.load then love.load() end")) displayError();
+	if (luaU_dostring(L, "if love.load then love.load() end")) displayError();
 
 	while (aptMainLoop()) {
 
@@ -110,7 +112,7 @@ int main() {
 
 			// }; TODO: Do this properly.
 
-			if (luaL_dostring(L, "if love.quit then love.quit() end")) displayError();
+			if (luaU_dostring(L, "if love.quit then love.quit() end")) displayError();
 
 			if (!shouldAbort && !errorOccured) break;
 
@@ -118,7 +120,7 @@ int main() {
 
 		if (!errorOccured) {
 
-			if (luaL_dostring(L,
+			if (luaU_dostring(L,
 				"love.keyboard.scan()\n"
 				"love.timer.step()\n"
 				"if love.update then love.update(love.timer.getDelta()) end")) {
@@ -130,7 +132,7 @@ int main() {
 
 			sf2d_start_frame(GFX_TOP, GFX_LEFT);
 
-				if (luaL_dostring(L, "if love.draw then love.draw() end")) displayError();
+				if (luaU_dostring(L, "if love.draw then love.draw() end")) displayError();
 
 			sf2d_end_frame();
 
@@ -140,7 +142,7 @@ int main() {
 
 				sf2d_start_frame(GFX_TOP, GFX_RIGHT);
 
-					if (luaL_dostring(L, "if love.draw then love.draw() end")) displayError();
+					if (luaU_dostring(L, "if love.draw then love.draw() end")) displayError();
 
 				sf2d_end_frame();
 
@@ -150,11 +152,11 @@ int main() {
 
 			sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
 
-				if (luaL_dostring(L, "if love.draw then love.draw() end")) displayError();
+				if (luaU_dostring(L, "if love.draw then love.draw() end")) displayError();
 
 			sf2d_end_frame();
 
-			luaL_dostring(L, "love.graphics.present()");
+			luaU_dostring(L, "love.graphics.present()");
 
 		} else {
 
@@ -165,7 +167,7 @@ int main() {
 				shouldQuit = true;
 			}
 
-			char *errMsg = lua_tostring(L, -1);
+			const char *errMsg = lua_tostring(L, -1);
 
 			sf2d_start_frame(GFX_TOP, GFX_LEFT);
 
@@ -197,13 +199,13 @@ int main() {
 
 			sf2d_end_frame();
 
-			luaL_dostring(L, "love.graphics.present()");
+			luaU_dostring(L, "love.graphics.present()");
 
 		}
 
 	}
 
-	luaL_dostring(L, "love.audio.stop()");
+	luaU_dostring(L, "love.audio.stop()");
 	finiLove();
 
 	lua_close(L);

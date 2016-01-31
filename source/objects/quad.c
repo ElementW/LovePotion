@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include "../shared.h"
+#include "../util.h"
 
 #define CLASS_TYPE  LUAOBJ_TYPE_QUAD
 #define CLASS_NAME  "Quad"
@@ -51,7 +52,7 @@ int quadNew(lua_State *L) { // love.graphics.newQuad()
 
 	const char *error = quadInit(self, x, y, width, height);
 
-	if (error) luaError(error);
+	if (error) luaU_error(L, error);
 
 	return 1;
 }

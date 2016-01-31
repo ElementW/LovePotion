@@ -20,18 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include "util.h"
 #include "shared.h"
-
-#define CONFIG_3D_SLIDERSTATE (*(float*)0x1FF81080)
 
 int fileExists(const char *filename) {
 	struct stat st;
 	int result = stat(filename, &st);
 	return result == 0;
-}
-
-void luaError(lua_State *L, const char *message) {
-	luaL_error(L, message);
 }
 
 const char* fileExtension(const char *filename) {

@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include "../shared.h"
+#include "../util.h"
 
 #define CLASS_TYPE  LUAOBJ_TYPE_IMAGE
 #define CLASS_NAME  "Image"
@@ -51,16 +52,16 @@ int imageNew(lua_State *L) { // love.graphics.newImage()
 
 	const char *filename = luaL_checkstring(L, 1);
 
-	if (!fileExists(filename)) luaError(L, "Could not open image, does not exist");
+	if (!fileExists(filename)) luaU_error(L, "Could not open image, does not exist");
 
 	int type = getType(filename);
-	if (type == 4) luaError(L, "Unknown image type");
+	if (type == 4) luaU_error(L, "Unknown image type");
 
 	love_image *self = luaobj_newudata(L, sizeof(*self));
 	luaobj_setclass(L, CLASS_TYPE, CLASS_NAME);
 
 	const char *error = imageInit(self, filename);
-	if (error) luaError(L, error);
+	if (error) luaU_error(L, error);
 
 	sf2d_texture_set_params(self->texture, defaultFilter);
 	self->minFilter = defaultMinFilter;
@@ -115,8 +116,8 @@ int imageSetFilter(lua_State *L) { // image:setFilter()
 
 	love_image *self = luaobj_checkudata(L, 1, CLASS_TYPE);
 
-	char *minMode = luaL_checkstring(L, 2);
-	char *magMode = luaL_optstring(L, 3, minMode);
+	const char *minMode = luaL_checkstring(L, 2);
+	const char *magMode = luaL_optstring(L, 3, minMode);
 
 	u32 minFilter;
 	u32 magFilter;
@@ -125,7 +126,7 @@ int imageSetFilter(lua_State *L) { // image:setFilter()
 		strcmp(minMode, "nearest") != 0 &&
 		strcmp(magMode, "linear") != 0 &&
 		strcmp(magMode, "nearest") != 0) {
-			luaError(L, "Invalid Image Filter.");
+			luaU_error(L, "Invalid Image Filter.");
 			return 0;
 		}
 

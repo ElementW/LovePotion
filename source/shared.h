@@ -41,12 +41,12 @@
 #include <unistd.h>
 #include <3ds/services/cfgu.h>
 
-#define CONFIG_3D_SLIDERSTATE (*(float*)0x1FF81080)
+#define CONFIG_3D_SLIDERSTATE (*(volatile float*)0x1FF81080)
 
 typedef struct {
 	sf2d_texture *texture;
-	char *minFilter;
-	char *magFilter;
+	const char *minFilter;
+	const char *magFilter;
 } love_image;
 
 typedef struct {
@@ -111,5 +111,5 @@ extern const char *fontDefaultInit();
 extern bool soundEnabled;
 extern bool channelList[24];
 extern u32 defaultFilter;
-extern char *defaultMinFilter;
-extern char *defaultMagFilter;
+extern const char *defaultMinFilter;
+extern const char *defaultMagFilter;

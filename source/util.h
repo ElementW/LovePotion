@@ -23,14 +23,22 @@
 #ifndef UTIL_H_INCLUDED
 #define UTIL_H_INCLUDED
 
-int fileExists(const char *filename);
+#include "libs/lua/lauxlib.h"
 
-void luaError(lua_State *L, const char *message);
+int fileExists(const char *filename);
 
 const char *fileExtension(const char *filename);
 
 char* concat(const char *s1, const char *s2) ;
 
 int getType(const char *name);
+
+inline static void luaU_error(lua_State *L, const char *message) {
+	luaL_error(L, message);
+}
+
+inline static int luaU_dostring(lua_State *L, const char *str) {
+	return luaL_dostring(L, str);
+}
 
 #endif

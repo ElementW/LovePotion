@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include "../shared.h"
+#include "../util.h"
 
 struct Color {
 
@@ -81,8 +82,8 @@ bool is3D = false;
 int currentDepth = 0;
 
 u32 defaultFilter = GPU_TEXTURE_MAG_FILTER(GPU_LINEAR)|GPU_TEXTURE_MIN_FILTER(GPU_LINEAR); // Default Image Filter.
-char *defaultMinFilter = "linear";
-char *defaultMagFilter = "linear";
+const char *defaultMinFilter = "linear";
+const char *defaultMagFilter = "linear";
 
 u32 getCurrentColor() {
 
@@ -139,7 +140,7 @@ static int graphicsSetColor(lua_State *L) { // love.graphics.setColor()
 
 	} else if (lua_istable(L, -1)) {
 
-		luaError(L, "Table support for setColor is not implemented yet. Use unpack(insertTableHere) until it is.");
+		luaU_error(L, "Table support for setColor is not implemented yet. Use unpack(insertTableHere) until it is.");
 
 	}
 
@@ -162,7 +163,7 @@ static int graphicsRectangle(lua_State *L) { // love.graphics.rectangle()
 
 	if (sf2d_get_current_screen() == currentScreen) {
 
-		char *mode = luaL_checkstring(L, 1);
+		const char *mode = luaL_checkstring(L, 1);
 
 		int x = luaL_checkinteger(L, 2);
 		int y = luaL_checkinteger(L, 3);
@@ -193,8 +194,10 @@ static int graphicsCircle(lua_State *L) { // love.graphics.circle()
 	if (sf2d_get_current_screen() == currentScreen) {
 
 		int step = 15;
+		(void) step;
 
-		char *mode = luaL_checkstring(L, 1);
+		const char *mode = luaL_checkstring(L, 1);
+		(void) mode;
 		int x = luaL_checkinteger(L, 2);
 		int y = luaL_checkinteger(L, 3);
 		int r = luaL_checkinteger(L, 4);
@@ -218,7 +221,7 @@ static int graphicsLine(lua_State *L) { // love.graphics.line() -- Semi-Broken
 		int i = 0;
 
 		if ((argc/2)*2 == argc) {
-			for( i; i < argc / 2; i++) {
+			for(; i < argc / 2; i++) {
 
 				int t = i * 4;
 
@@ -255,7 +258,7 @@ static int graphicsGetScreen(lua_State *L) { // love.graphics.getScreen()
 
 static int graphicsSetScreen(lua_State *L) { // love.graphics.setScreen()
 
-	char *screen = luaL_checkstring(L, 1);
+	const char *screen = luaL_checkstring(L, 1);
 
 	if (strcmp(screen, "top") == 0) {
 		currentScreen = GFX_TOP;
@@ -300,7 +303,7 @@ static int graphicsGetWidth(lua_State *L) { // love.graphics.getWidth()
 
 		returnWidth = topWidth;
 
-	} else if (currentScreen == GFX_BOTTOM) {
+	} else /* if (currentScreen == GFX_BOTTOM) */ {
 
 		returnWidth = botWidth;
 
@@ -408,7 +411,7 @@ static int graphicsPrint(lua_State *L) { // love.graphics.print()
 
 		if (currentFont) {
 
-			char *printText = luaL_checkstring(L, 1);
+			const char *printText = luaL_checkstring(L, 1);
 			int x = luaL_checkinteger(L, 2);
 			int y = luaL_checkinteger(L, 3);
 
@@ -430,11 +433,11 @@ static int graphicsPrintFormat(lua_State *L) {
 
 		if (currentFont) {
 
-			char *printText = luaL_checkstring(L, 1);
+			const char *printText = luaL_checkstring(L, 1);
 			int x = luaL_checkinteger(L, 2);
 			int y = luaL_checkinteger(L, 3);
 			int limit = luaL_checkinteger(L, 4);
-			char *align = luaL_optstring(L, 5, "left");
+			const char *align = luaL_optstring(L, 5, "left");
 
 			int width = sftd_get_text_width(currentFont->font, currentFont->size, printText);
 
@@ -556,20 +559,22 @@ static int graphicsGetDepth(lua_State *L) { // love.graphics.getDepth()
 
 static int graphicsSetLineWidth(lua_State *L) { // love.graphics.setLineWidth()
 
- // TODO: Do this properly
+	// TODO: Do this properly
+	return 0;
 
 }
 
 static int graphicsGetLineWidth(lua_State *L) { // love.graphics.getLineWidth()
 
- // TODO: This too.
+	// TODO: This too.
+	return 0;
 
 }
 
 static int graphicsSetDefaultFilter(lua_State *L) { // love.graphics.setDefaultFilter()
 
-	char *minMode = luaL_checkstring(L, 1);
-	char *magMode = luaL_optstring(L, 2, minMode);
+	const char *minMode = luaL_checkstring(L, 1);
+	const char *magMode = luaL_optstring(L, 2, minMode);
 
 	u32 minFilter;
 	u32 magFilter;
@@ -577,8 +582,8 @@ static int graphicsSetDefaultFilter(lua_State *L) { // love.graphics.setDefaultF
 	if (strcmp(minMode, "linear") != 0 && 
 		strcmp(minMode, "nearest") != 0 &&
 		strcmp(magMode, "linear") != 0 &&
-		strcmp(magMode, "nearest" != 0)) {
-			luaError(L, "Invalid Image Filter.");
+		strcmp(magMode, "nearest") != 0) {
+			luaU_error(L, "Invalid Image Filter.");
 			return 0;
 		}
 
